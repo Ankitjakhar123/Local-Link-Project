@@ -37,14 +37,14 @@ const ProductCard3D = ({ product, type = "product" }) => {
   };
 
   const enhanceStyles = () => {
-    setScale(1.05);
+    setScale(1.03);
     setIsHovered(true);
   };
 
   return (
     <motion.div
       ref={cardRef}
-      className="relative w-full h-[420px] rounded-xl overflow-hidden perspective-1000"
+      className="relative w-full h-[330px] rounded-xl overflow-hidden perspective-1000"
       style={{ perspective: "1000px" }}
       onMouseMove={handleMouseMove}
       onMouseEnter={enhanceStyles}
@@ -55,9 +55,9 @@ const ProductCard3D = ({ product, type = "product" }) => {
         scale: scale,
         boxShadow: isHovered 
           ? isDarkMode 
-            ? '0 20px 40px rgba(132, 90, 223, 0.3), 0 0 15px rgba(156, 81, 161, 0.3)' 
-            : '0 15px 30px rgba(0, 0, 0, 0.2)'
-          : '0 5px 15px rgba(0, 0, 0, 0.1)'
+            ? '0 15px 30px rgba(132, 90, 223, 0.3), 0 0 10px rgba(156, 81, 161, 0.3)' 
+            : '0 10px 20px rgba(0, 0, 0, 0.15)'
+          : '0 3px 10px rgba(0, 0, 0, 0.1)'
       }}
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
     >
@@ -76,13 +76,13 @@ const ProductCard3D = ({ product, type = "product" }) => {
       >
         {/* Badge */}
         {product.badge && (
-          <div className="absolute top-4 left-4 z-20 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
+          <div className="absolute top-3 left-3 z-20 bg-accent text-white text-xs font-bold px-2 py-0.5 rounded-full">
             {product.badge}
           </div>
         )}
         
         {/* Image */}
-        <div className="h-[220px] overflow-hidden">
+        <div className="h-[160px] overflow-hidden">
           <motion.img 
             src={product.image} 
             alt={product.name} 
@@ -93,25 +93,25 @@ const ProductCard3D = ({ product, type = "product" }) => {
         </div>
         
         {/* Content */}
-        <div className="p-6 flex flex-col flex-grow">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-xl font-semibold text-foreground">{product.name}</h3>
+        <div className="p-4 flex flex-col flex-grow">
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="text-base font-semibold text-foreground truncate">{product.name}</h3>
             {type === "product" && (
-              <span className="text-accent font-bold">₹{product.price}</span>
+              <span className="text-accent font-bold text-sm">₹{product.price}</span>
             )}
           </div>
           
-          <p className="text-muted-foreground text-sm mb-4 flex-grow">{product.description}</p>
+          <p className="text-muted-foreground text-xs mb-3 line-clamp-2 flex-grow">{product.description}</p>
           
           {/* Rating */}
           {product.rating && (
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-2">
               {[...Array(5)].map((_, i) => (
                 <svg 
                   key={i} 
                   xmlns="http://www.w3.org/2000/svg" 
-                  width="16" 
-                  height="16" 
+                  width="12" 
+                  height="12" 
                   viewBox="0 0 24 24" 
                   fill={i < Math.floor(product.rating) ? "currentColor" : "none"}
                   stroke="currentColor" 
@@ -132,21 +132,21 @@ const ProductCard3D = ({ product, type = "product" }) => {
           >
             <Link 
               to={type === "product" ? `/shop/${product.id}` : `/services/${product.id}`}
-              className="text-primary font-medium flex items-center gap-2 text-sm"
+              className="text-primary font-medium flex items-center gap-1 text-xs"
             >
               View Details
               <motion.span
-                animate={{ x: isHovered ? 5 : 0 }}
+                animate={{ x: isHovered ? 3 : 0 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <ArrowRight size={16} />
+                <ArrowRight size={12} />
               </motion.span>
             </Link>
             
             {type === "product" && (
               <motion.button 
-                className="btn btn-sm btn-primary py-1.5 px-3 rounded-lg text-xs"
-                animate={{ scale: isHovered ? 1.1 : 1 }}
+                className="btn btn-xs btn-primary py-1 px-2 rounded-lg text-xs"
+                animate={{ scale: isHovered ? 1.05 : 1 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Add to Cart

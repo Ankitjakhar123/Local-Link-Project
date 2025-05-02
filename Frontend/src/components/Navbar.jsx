@@ -136,8 +136,8 @@ const Navbar = () => {
         animate="visible"
         variants={navVariants}
       >
-        <div className="container mx-auto flex justify-between items-center">
-          {/* Logo */}
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo */}
           <motion.div 
             className="relative"
             whileHover={{ 
@@ -162,14 +162,14 @@ const Navbar = () => {
                   <Zap size={15} className="inline" />
                 </motion.span>
               </div>
-            </Link>
+        </Link>
             {/* Background glow effect */}
             {isDarkMode && (
               <div className="absolute inset-0 bg-primary/20 filter blur-xl rounded-full w-12 h-12 -z-10"></div>
             )}
           </motion.div>
 
-          {/* Desktop Navigation */}
+        {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
             {navLinks.map((item, i) => (
               <motion.div 
@@ -257,9 +257,9 @@ const Navbar = () => {
                 )}
               </motion.div>
             ))}
-          </nav>
+        </nav>
 
-          {/* Search Bar - Desktop */}
+        {/* Search Bar - Desktop */}
           <motion.div 
             className="hidden lg:block flex-1 max-w-md mx-6"
             variants={itemVariants}
@@ -271,12 +271,12 @@ const Navbar = () => {
               onClick={handleSearchFocus}
             >
               <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-                <input
+            <input
                   ref={searchInputRef}
-                  type="text"
+              type="text"
                   placeholder="What are you looking for?"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
                   className={`w-full px-5 py-2.5 pl-12 pr-4 rounded-full transition-all duration-300 ${
                     isDarkMode 
                       ? 'bg-muted/30 border-2 border-muted/30 focus:border-primary/50 text-foreground'
@@ -303,7 +303,7 @@ const Navbar = () => {
                 >
                   <Search size={14} />
                 </button>
-              </form>
+          </form>
               
               {/* Search highlight effect */}
               {isDarkMode && (
@@ -311,10 +311,10 @@ const Navbar = () => {
                   <div className="absolute inset-0 rounded-full bg-primary/5 blur-md"></div>
                 </div>
               )}
-            </div>
+        </div>
           </motion.div>
 
-          {/* Right side icons */}
+        {/* Right side icons */}
           <div className="flex items-center space-x-1 sm:space-x-2">
             <motion.div
               whileHover={{ rotate: [0, -15, 15, -5, 0] }}
@@ -322,15 +322,15 @@ const Navbar = () => {
               variants={itemVariants}
               className="relative"
             >
-              <button 
-                onClick={toggleTheme}
+          <button 
+            onClick={toggleTheme}
                 className={`p-2.5 rounded-full transition-all duration-500 relative overflow-hidden ${
                   isDarkMode 
                     ? 'bg-muted/30 hover:bg-muted/50' 
                     : 'bg-muted/20 hover:bg-muted/30'
                 }`}
-                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-              >
+            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={isDarkMode ? 'dark' : 'light'}
@@ -346,8 +346,8 @@ const Navbar = () => {
                     )}
                   </motion.div>
                 </AnimatePresence>
-              </button>
-              
+          </button>
+          
               {/* Button highlight */}
               {isDarkMode && (
                 <div className="absolute inset-0 -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
@@ -371,9 +371,9 @@ const Navbar = () => {
                 }`}
                 aria-label="Shop"
               >
-                <ShoppingBag size={20} />
-              </Link>
-              
+            <ShoppingBag size={20} />
+          </Link>
+          
               {/* Button highlight */}
               {isDarkMode && (
                 <div className="absolute inset-0 -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
@@ -397,8 +397,8 @@ const Navbar = () => {
                 }`}
                 aria-label="Cart"
               >
-                <ShoppingCart size={20} />
-                {itemCount > 0 && (
+            <ShoppingCart size={20} />
+            {itemCount > 0 && (
                   <motion.div 
                     className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center"
                     initial={{ scale: 0 }}
@@ -411,9 +411,9 @@ const Navbar = () => {
                   >
                     <span className="text-xs font-bold text-white">{itemCount}</span>
                   </motion.div>
-                )}
-              </Link>
-              
+            )}
+          </Link>
+          
               {/* Button highlight */}
               {isDarkMode && (
                 <div className="absolute inset-0 -z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
@@ -437,8 +437,8 @@ const Navbar = () => {
                 }`}
                 aria-label={user ? "Profile" : "Login"}
               >
-                <User size={20} />
-              </Link>
+            <User size={20} />
+          </Link>
               
               {/* Button highlight */}
               {isDarkMode && (
@@ -447,14 +447,14 @@ const Navbar = () => {
                 </div>
               )}
             </motion.div>
-            
-            {/* Mobile menu button */}
+          
+          {/* Mobile menu button */}
             <motion.div 
               variants={itemVariants} 
               className="relative lg:hidden"
             >
-              <button
-                onClick={() => setIsOpen(!isOpen)}
+          <button 
+            onClick={() => setIsOpen(!isOpen)}
                 className={`p-2.5 rounded-full transition-all duration-300 ${
                   isDarkMode 
                     ? 'bg-muted/30 hover:bg-muted/50' 
@@ -469,11 +469,11 @@ const Navbar = () => {
                     animate={{ rotate: 0, opacity: 1 }}
                     exit={{ rotate: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
-                  >
-                    {isOpen ? <X size={20} /> : <Menu size={20} />}
+          >
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
                   </motion.div>
                 </AnimatePresence>
-              </button>
+          </button>
               
               {/* Button highlight */}
               {isDarkMode && (
@@ -488,7 +488,7 @@ const Navbar = () => {
       
       {/* Mobile menu */}
       <AnimatePresence>
-        {isOpen && (
+      {isOpen && (
           <motion.div 
             className="fixed inset-0 z-40 lg:hidden"
             initial={{ opacity: 0 }}
@@ -537,14 +537,14 @@ const Navbar = () => {
                   </button>
                 </div>
                 
-                {/* Search Bar - Mobile */}
+            {/* Search Bar - Mobile */}
                 <div className="mb-8">
                   <form onSubmit={handleSearchSubmit} className="relative">
-                    <input
-                      type="text"
+              <input
+                type="text"
                       placeholder="Search..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                       className={`w-full px-4 py-3 pl-12 rounded-xl ${
                         isDarkMode 
                           ? 'bg-muted/30 border-2 border-muted/30 focus:border-primary/50' 
@@ -560,10 +560,10 @@ const Navbar = () => {
                     >
                       <Search size={14} />
                     </button>
-                  </form>
+            </form>
                 </div>
-                
-                {/* Mobile Navigation Links */}
+            
+            {/* Mobile Navigation Links */}
                 <nav className="space-y-1 mb-8">
                   {navLinks.map((item, i) => (
                     <div key={item.name}>
@@ -627,7 +627,7 @@ const Navbar = () => {
                       )}
                     </div>
                   ))}
-                </nav>
+            </nav>
                 
                 {/* Action Buttons - Mobile */}
                 <div className="space-y-3 mt-auto pb-6">
@@ -653,8 +653,8 @@ const Navbar = () => {
                   >
                     Contact Us
                   </Button>
-                </div>
-              </div>
+          </div>
+        </div>
             </motion.div>
           </motion.div>
         )}

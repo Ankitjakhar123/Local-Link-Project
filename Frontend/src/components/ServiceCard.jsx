@@ -35,7 +35,7 @@ const ServiceCard = ({
       }
     },
     hover: {
-      y: -8,
+      y: -5,
       transition: { 
         type: "spring", 
         stiffness: 400, 
@@ -62,9 +62,9 @@ const ServiceCard = ({
     >
       {/* Premium Badge */}
       {premium && (
-        <div className="absolute top-4 left-4 z-10">
+        <div className="absolute top-2 left-2 z-10">
           <motion.div
-            className={`px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider ${
+            className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase tracking-wider ${
               isDarkMode 
                 ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-[0_0_10px_rgba(132,90,223,0.3)]' 
                 : 'bg-gradient-to-r from-primary to-secondary text-white shadow-md'
@@ -83,7 +83,7 @@ const ServiceCard = ({
         <img 
           src={image} 
           alt={title}
-          className="w-full h-48 object-cover"
+          className="w-full h-36 object-cover"
         />
         {/* Overlay gradients */}
         <div className={`absolute inset-0 ${
@@ -93,23 +93,23 @@ const ServiceCard = ({
         } opacity-50`}></div>
         
         {/* Rating Badge */}
-        <div className="absolute bottom-4 left-4">
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-md ${
+        <div className="absolute bottom-2 left-2">
+          <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md ${
             isDarkMode 
               ? 'bg-card/80 backdrop-blur-sm' 
               : 'bg-white/90 backdrop-blur-sm shadow-sm'
           }`}>
-            <Star className="text-yellow-500" size={14} fill="currentColor" />
-            <span className="text-sm font-medium">{rating}</span>
+            <Star className="text-yellow-500" size={12} fill="currentColor" />
+            <span className="text-xs font-medium">{rating}</span>
             <span className="text-xs text-muted-foreground">({reviewCount})</span>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-5 space-y-3">
+      <div className="p-3 space-y-2">
         <motion.h3 
-          className={`text-xl font-semibold ${premium && isDarkMode ? 'text-primary-foreground' : 'text-foreground'}`}
+          className={`text-base font-semibold ${premium && isDarkMode ? 'text-primary-foreground' : 'text-foreground'} truncate`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 + index * 0.1 }}
@@ -118,7 +118,7 @@ const ServiceCard = ({
         </motion.h3>
         
         <motion.p 
-          className="text-muted-foreground text-sm line-clamp-2"
+          className="text-xs text-muted-foreground line-clamp-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 + index * 0.1 }}
@@ -127,21 +127,21 @@ const ServiceCard = ({
         </motion.p>
         
         <motion.div 
-          className="pt-3 flex justify-between items-center"
+          className="pt-2 flex justify-between items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 + index * 0.1 }}
         >
           <div>
-            <span className="text-lg font-bold">₹{price.toLocaleString('en-IN')}</span>
+            <span className="text-sm font-bold">₹{price.toLocaleString('en-IN')}</span>
             <span className="text-xs text-muted-foreground ml-1">onwards</span>
           </div>
           
           <Link to={`/services/${id}`}>
             <Button 
               variant={premium ? "primary" : "outline"} 
-              size="sm"
-              icon={<ArrowRight size={16} />}
+              size="xs"
+              icon={<ArrowRight size={14} />}
               iconPosition="right"
               glowEffect={premium}
               animate={false}

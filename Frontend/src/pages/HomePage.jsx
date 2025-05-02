@@ -20,7 +20,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const [activeTab, setActiveTab] = useState('popular');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Handle hero search
   const handleSearch = (query) => {
@@ -105,22 +105,26 @@ const HomePage = () => {
   }));
 
   return (
-    <div>
+    <div className="bg-background dark">
       {/* Hero Section */}
       <ParallaxHero onSearch={handleSearch} />
 
       {/* Premium Services Section */}
-      <section className="py-32 relative overflow-hidden">
+      <section className="py-32 relative overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
         {/* Decorative background elements */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-2/3 h-2/3 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full opacity-70"></div>
-          <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-tr from-secondary/10 to-transparent rounded-tr-full opacity-70"></div>
+          <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-primary/10 to-transparent rounded-full opacity-70"></div>
+          <div className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-tr from-secondary/10 to-transparent rounded-full opacity-70"></div>
+          
+          {/* Complete 3D circles */}
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full border border-primary/20 opacity-20"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-[600px] h-[600px] rounded-full border border-secondary/20 opacity-20"></div>
           
           {/* Geometric patterns */}
           <div className="absolute inset-0 cyberpunk-grid opacity-10"></div>
           
           {/* Animated dots */}
-          {[...Array(6)].map((_, index) => (
+          {[...Array(8)].map((_, index) => (
             <motion.div
               key={`dot-${index}`}
               className="absolute w-1.5 h-1.5 rounded-full bg-primary/50"
@@ -228,7 +232,7 @@ const HomePage = () => {
           
           {/* Services grid */}
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
             variants={{
               hidden: { opacity: 0 },
               show: {
@@ -293,16 +297,18 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
-      
+
       {/* Our Products Section */}
-      <section className="py-32 relative overflow-hidden">
+      <section className="py-32 relative overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
         {/* Background elements */}
-        <div className={`absolute inset-0 z-0 ${
-          isDarkMode ? 'bg-gradient-to-br from-background via-card to-background' : 'bg-gradient-to-br from-muted/20 via-white to-muted/10'
-        }`}>
+        <div className="absolute inset-0 z-0">
           {/* Radial gradient accent */}
-          <div className="absolute top-1/3 left-1/4 w-96 h-96 rounded-full bg-secondary/10 blur-3xl"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-accent/10 blur-3xl"></div>
+          <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] rounded-full bg-secondary/10 blur-3xl"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-[600px] h-[600px] rounded-full bg-accent/10 blur-3xl"></div>
+          
+          {/* Complete 3D circles */}
+          <div className="absolute top-1/3 right-1/3 w-[400px] h-[400px] rounded-full border border-accent/20 opacity-20"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-[500px] h-[500px] rounded-full border border-primary/20 opacity-20"></div>
           
           {/* Grid pattern */}
           <div className="absolute inset-0 cyberpunk-grid opacity-10"></div>
@@ -372,7 +378,7 @@ const HomePage = () => {
           
           {/* Featured products */}
           <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"
             variants={{
               hidden: { opacity: 0 },
               show: {
@@ -386,7 +392,7 @@ const HomePage = () => {
             whileInView="show"
             viewport={{ once: true, amount: 0.1 }}
           >
-            {products.slice(0, 8).map((product, index) => (
+            {products.slice(0, 12).map((product, index) => (
               <motion.div
                 key={product.id}
                 variants={{
@@ -395,8 +401,8 @@ const HomePage = () => {
                 }}
                 className={`group relative overflow-hidden rounded-xl ${
                   isDarkMode 
-                    ? 'bg-card/50 border border-muted/30 hover:border-accent/30' 
-                    : 'bg-white border border-muted/20 hover:border-accent/20 shadow-lg hover:shadow-xl'
+                    ? 'bg-gradient-to-br from-background via-card/70 to-background border border-accent/10 hover:border-accent/30 shadow-[0_0_20px_rgba(156,81,161,0.15)]' 
+                    : 'bg-gradient-to-br from-background via-card/70 to-background border border-accent/10 hover:border-accent/30 shadow-[0_0_20px_rgba(156,81,161,0.15)]'
                 } transition-all duration-300`}
                 whileHover={{ y: -5 }}
               >
@@ -412,28 +418,28 @@ const HomePage = () => {
                   
                   {/* Quick view overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
-                    <button className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium hover:bg-white/30 transition-colors">
+                    <button className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium hover:bg-white/30 transition-colors">
                       Quick View
                     </button>
                   </div>
                 </div>
                 
                 {/* Product info */}
-                <div className="p-4">
+                <div className="p-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-medium text-foreground mb-1">{product.name}</h3>
-                      <p className="text-muted-foreground text-sm">{product.category}</p>
+                      <h3 className="font-medium text-foreground mb-1 text-sm truncate">{product.name}</h3>
+                      <p className="text-muted-foreground text-xs">{product.category}</p>
                     </div>
-                    <div className="text-accent font-bold">₹{product.price}</div>
+                    <div className="text-accent font-bold text-sm">₹{product.price}</div>
                   </div>
                   
                   {/* Rating */}
-                  <div className="flex items-center gap-1 mt-3">
+                  <div className="flex items-center gap-1 mt-2">
                     {[...Array(5)].map((_, i) => (
                       <Star 
                         key={i} 
-                        size={12} 
+                        size={10} 
                         className={i < Math.floor(product.rating) ? "fill-warning text-warning" : "text-muted-foreground"} 
                       />
                     ))}
@@ -442,19 +448,19 @@ const HomePage = () => {
                   
                   {/* Add to cart */}
                   <motion.button 
-                    className="w-full mt-4 py-2 rounded-lg bg-gradient-to-r from-accent to-accent/80 text-white text-sm font-medium flex items-center justify-center gap-2 hover:from-accent/90 hover:to-accent/70"
+                    className="w-full mt-3 py-1.5 rounded-lg bg-gradient-to-r from-accent to-accent/80 text-white text-xs font-medium flex items-center justify-center gap-1 hover:from-accent/90 hover:to-accent/70"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <ShoppingBag size={14} />
+                    <ShoppingBag size={12} />
                     Add to Cart
                   </motion.button>
                 </div>
                 
                 {/* Badge if available */}
                 {index < 2 && (
-                  <div className="absolute top-3 left-3 px-2 py-1 bg-accent text-white text-xs font-bold rounded-md flex items-center gap-1">
-                    <BadgeCheck size={12} />
+                  <div className="absolute top-2 left-2 px-2 py-0.5 bg-accent text-white text-xs font-bold rounded-md flex items-center gap-1">
+                    <BadgeCheck size={10} />
                     Bestseller
                   </div>
                 )}
@@ -487,8 +493,22 @@ const HomePage = () => {
       <ServiceTimeline />
 
       {/* Features Section */}
-      <section className="py-24 bg-card/30">
-        <div className="container">
+      <section className="py-24 relative overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
+        {/* Background elements */}
+        <div className="absolute inset-0 z-0">
+          {/* Radial gradient accent */}
+          <div className="absolute top-1/4 left-1/3 w-[400px] h-[400px] rounded-full bg-primary/10 blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] rounded-full bg-secondary/10 blur-3xl"></div>
+          
+          {/* Complete 3D circles */}
+          <div className="absolute top-1/2 right-1/4 w-[450px] h-[450px] rounded-full border border-primary/20 opacity-20"></div>
+          <div className="absolute bottom-1/2 left-1/4 w-[350px] h-[350px] rounded-full border border-secondary/20 opacity-20"></div>
+          
+          {/* Grid pattern */}
+          <div className="absolute inset-0 cyberpunk-grid opacity-10"></div>
+        </div>
+        
+        <div className="container relative z-10">
           <motion.h2 
             className="text-4xl font-bold mb-16 text-center gradient-text"
             initial={{ opacity: 0, y: 20 }}
@@ -503,14 +523,14 @@ const HomePage = () => {
             {features.map((feature, index) => (
               <motion.div 
                 key={index} 
-                className="bg-card p-8 rounded-xl border border-muted/30 shadow-lg text-center"
+                className="bg-card/30 backdrop-blur-sm p-8 rounded-xl border border-primary/10 shadow-[0_0_20px_rgba(132,90,223,0.15)] text-center"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ 
                   y: -10,
-                  boxShadow: "0 20px 30px rgba(0, 0, 0, 0.2)",
+                  boxShadow: "0 20px 30px rgba(132, 90, 223, 0.2)",
                   borderColor: "rgba(156, 81, 161, 0.3)"
                 }}
               >
@@ -526,8 +546,22 @@ const HomePage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24">
-        <div className="container">
+      <section className="py-24 relative overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
+        {/* Background elements */}
+        <div className="absolute inset-0 z-0">
+          {/* Radial gradient accent */}
+          <div className="absolute top-1/3 right-1/3 w-[500px] h-[500px] rounded-full bg-primary/10 blur-3xl"></div>
+          <div className="absolute bottom-1/3 left-1/3 w-[500px] h-[500px] rounded-full bg-accent/10 blur-3xl"></div>
+          
+          {/* Complete 3D circles */}
+          <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full border border-accent/20 opacity-20"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full border border-primary/20 opacity-20"></div>
+          
+          {/* Grid pattern */}
+          <div className="absolute inset-0 cyberpunk-grid opacity-10"></div>
+        </div>
+        
+        <div className="container relative z-10">
           <motion.h2 
             className="text-4xl font-bold mb-12 text-center gradient-text"
             initial={{ opacity: 0, y: 20 }}
@@ -561,10 +595,10 @@ const HomePage = () => {
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl font-bold mb-6">Ready to get started?</h2>
-            <p className="text-white/80 mb-12 max-w-2xl mx-auto">
-              Download our app for the best experience and exclusive offers. Available on iOS and Android.
-            </p>
+          <h2 className="text-4xl font-bold mb-6">Ready to get started?</h2>
+          <p className="text-white/80 mb-12 max-w-2xl mx-auto">
+            Download our app for the best experience and exclusive offers. Available on iOS and Android.
+          </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6">
               <MicroInteractions.Button 
                 variant="secondary" 
@@ -573,7 +607,7 @@ const HomePage = () => {
                 className="bg-white text-primary hover:bg-white/90"
                 onClick={() => navigate('/services')}
               >
-                Browse Services
+              Browse Services
               </MicroInteractions.Button>
               <MicroInteractions.Button 
                 variant="outline" 
@@ -603,7 +637,7 @@ const HomePage = () => {
               >
                 <InstallPWA className="flex items-center">
                   <Download size={18} className="mr-2" />
-                  Download App
+              Download App
                 </InstallPWA>
               </MicroInteractions.Button>
             </div>
@@ -635,7 +669,7 @@ const HomePage = () => {
                   transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                 />
                 <span className="text-white font-medium">Works Offline</span>
-              </div>
+          </div>
             </motion.div>
           </motion.div>
         </div>
