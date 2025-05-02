@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalLink - Redirecting...</title>
+  <script>
+    // Single page app redirection
+    // This script redirects all 404s back to the main index.html
+    // to let client-side routing handle the actual routes
+    const pathname = window.location.pathname;
+    window.location.href = `${window.location.origin}?redirect=${pathname}`;
+  </script>
+</head>
+<body>
+  <noscript>
+    <h1>Redirecting...</h1>
+    <p>Please click <a href="/">here</a> to go back to the home page.</p>
+  </noscript>
+</body>
+</html> 
