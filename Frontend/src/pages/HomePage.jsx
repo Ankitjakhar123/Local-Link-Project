@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, ArrowUpRight, Download, SmartphoneCharging } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, Star, ArrowUpRight, Download, SmartphoneCharging, Sparkles, ShoppingBag, BadgeCheck, ChevronRight, Target } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 // Import our new components
 import ParallaxHero from '../components/ParallaxHero';
@@ -14,11 +14,13 @@ import InstallPWA from '../components/InstallPWA';
 
 // Import data 
 import { services } from '../data/services';
+import { products } from '../data/products';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const [activeTab, setActiveTab] = useState('popular');
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Handle hero search
   const handleSearch = (query) => {
@@ -107,80 +109,160 @@ const HomePage = () => {
       {/* Hero Section */}
       <ParallaxHero onSearch={handleSearch} />
 
-      {/* Popular Services Section */}
-      <section className="py-24">
-        <div className="container">
+      {/* Premium Services Section */}
+      <section className="py-32 relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 right-0 w-2/3 h-2/3 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full opacity-70"></div>
+          <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-tr from-secondary/10 to-transparent rounded-tr-full opacity-70"></div>
+          
+          {/* Geometric patterns */}
+          <div className="absolute inset-0 cyberpunk-grid opacity-10"></div>
+          
+          {/* Animated dots */}
+          {[...Array(6)].map((_, index) => (
+            <motion.div
+              key={`dot-${index}`}
+              className="absolute w-1.5 h-1.5 rounded-full bg-primary/50"
+              style={{
+                top: `${20 + Math.random() * 60}%`,
+                left: `${10 + Math.random() * 80}%`,
+              }}
+              animate={{
+                opacity: [0.4, 0.8, 0.4],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 3,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+        
+        <div className="container relative z-10">
+          {/* Section header */}
+          <div className="text-center mb-16 relative">
+            <motion.div
+              className="inline-block mb-4 px-5 py-2 rounded-full bg-primary/10 border border-primary/20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="text-primary font-medium flex items-center gap-2">
+                <Sparkles size={16} className="text-secondary" />
+                Premium Services
+              </span>
+            </motion.div>
+            
+            <motion.h2 
+              className="text-5xl font-bold mb-6 gradient-text relative"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              Services Tailored for You
+              {/* Glowing underline */}
+              <motion.div 
+                className="absolute left-1/2 transform -translate-x-1/2 bottom-0 h-1 w-24 bg-gradient-to-r from-secondary via-primary to-accent rounded-full" 
+                animate={{ 
+                  boxShadow: ['0 0 5px rgba(132, 90, 223, 0.3)', '0 0 20px rgba(132, 90, 223, 0.7)', '0 0 5px rgba(132, 90, 223, 0.3)'] 
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </motion.h2>
+            
+            <motion.p 
+              className="text-lg text-muted-foreground max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              From home cleaning to appliance repair, our professionals are ready to assist you 
+              with exceptional service quality and guaranteed satisfaction.
+            </motion.p>
+          </div>
+          
+          {/* Service category tabs */}
           <motion.div 
-            className="text-center mb-12"
+            className="flex justify-center flex-wrap mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <h2 className="text-4xl font-bold mb-4 gradient-text">Our Services</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              From home cleaning to appliance repair, our professionals are ready to assist you.
-            </p>
+            <div className="flex flex-wrap justify-center p-1.5 rounded-xl backdrop-blur-sm border border-muted/30 bg-card/30 gap-2">
+              {['popular', 'newest', 'trending'].map((tab) => (
+                <motion.button 
+                  key={tab}
+                  className={`relative px-6 py-3 rounded-lg transition-all capitalize text-sm font-medium ${
+                    activeTab === tab
+                      ? 'text-white'
+                      : 'text-foreground hover:text-primary'
+                  }`}
+                  onClick={() => setActiveTab(tab)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {activeTab === tab && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-lg -z-10"
+                      layoutId="activeTabBackground"
+                      initial={{ opacity: 0.8 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0.8 }}
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    >
+                      <div className="absolute inset-0 bg-primary opacity-40 blur-xl rounded-lg"></div>
+                    </motion.div>
+                  )}
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </motion.button>
+              ))}
+            </div>
           </motion.div>
           
-          <div className="flex justify-center mb-12">
-            <div className="flex border rounded-lg p-1 bg-muted/10 backdrop-blur-lg">
-              <motion.button 
-                className={`px-6 py-3 rounded-md transition-all relative ${activeTab === 'popular' ? 'text-white' : 'text-foreground hover:bg-muted'}`}
-                onClick={() => setActiveTab('popular')}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+          {/* Services grid */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {featured3DServices.map((service, index) => (
+              <motion.div
+                key={service.id}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+                }}
               >
-                {activeTab === 'popular' && (
-                  <motion.div
-                    className="absolute inset-0 bg-primary rounded-md -z-10"
-                    layoutId="tabBackground"
-                    transition={{ type: "spring", duration: 0.5 }}
-                  />
-                )}
-                Popular
-              </motion.button>
-              <motion.button 
-                className={`px-6 py-3 rounded-md transition-all relative ${activeTab === 'newest' ? 'text-white' : 'text-foreground hover:bg-muted'}`}
-                onClick={() => setActiveTab('newest')}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {activeTab === 'newest' && (
-                  <motion.div
-                    className="absolute inset-0 bg-primary rounded-md -z-10"
-                    layoutId="tabBackground"
-                    transition={{ type: "spring", duration: 0.5 }}
-                  />
-                )}
-                Newest
-              </motion.button>
-              <motion.button 
-                className={`px-6 py-3 rounded-md transition-all relative ${activeTab === 'trending' ? 'text-white' : 'text-foreground hover:bg-muted'}`}
-                onClick={() => setActiveTab('trending')}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                {activeTab === 'trending' && (
-                  <motion.div
-                    className="absolute inset-0 bg-primary rounded-md -z-10"
-                    layoutId="tabBackground"
-                    transition={{ type: "spring", duration: 0.5 }}
-                  />
-                )}
-                Trending
-              </motion.button>
-            </div>
-          </div>
-          
-          {/* 3D Product Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featured3DServices.map(service => (
-              <ProductCard3D key={service.id} product={service} type="service" />
+                <ProductCard3D product={service} type="service" />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
           
-          <div className="text-center mt-12">
+          {/* View all button */}
+          <motion.div 
+            className="mt-16 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
             <MicroInteractions.Button 
               variant="primary" 
               size="lg"
@@ -188,21 +270,219 @@ const HomePage = () => {
               rippleEffect={true}
               glowEffect={true}
               onClick={() => navigate('/services')}
-              className="group"
+              className="group relative overflow-hidden"
             >
-              View All Services
+              <span className="relative z-10 flex items-center">
+                View All Services
+                <motion.span
+                  className="ml-2"
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <ArrowRight size={18} />
+                </motion.span>
+              </span>
+              
+              {/* Button background animation */}
+              <motion.div 
+                className="absolute inset-0 -z-10 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%]"
+                animate={{ backgroundPosition: ['0% center', '100% center', '0% center'] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              />
+            </MicroInteractions.Button>
+          </motion.div>
+        </div>
+      </section>
+      
+      {/* Our Products Section */}
+      <section className="py-32 relative overflow-hidden">
+        {/* Background elements */}
+        <div className={`absolute inset-0 z-0 ${
+          isDarkMode ? 'bg-gradient-to-br from-background via-card to-background' : 'bg-gradient-to-br from-muted/20 via-white to-muted/10'
+        }`}>
+          {/* Radial gradient accent */}
+          <div className="absolute top-1/3 left-1/4 w-96 h-96 rounded-full bg-secondary/10 blur-3xl"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-96 h-96 rounded-full bg-accent/10 blur-3xl"></div>
+          
+          {/* Grid pattern */}
+          <div className="absolute inset-0 cyberpunk-grid opacity-10"></div>
+        </div>
+        
+        <div className="container relative z-10">
+          {/* Section header */}
+          <div className="text-center mb-16">
+            <motion.div
+              className="inline-block mb-4 px-5 py-2 rounded-full bg-accent/10 border border-accent/20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="text-accent font-medium flex items-center gap-2">
+                <ShoppingBag size={16} className="text-accent" />
+                Premium Products
+              </span>
+            </motion.div>
+            
+            <motion.h2 
+              className="text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-secondary via-accent to-secondary"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              Quality Products Delivered
+            </motion.h2>
+            
+            <motion.p 
+              className="text-lg text-muted-foreground max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              Discover our curated collection of premium products to complement our services 
+              and enhance your home experience.
+            </motion.p>
+          </div>
+          
+          {/* Product categories pills */}
+          <motion.div 
+            className="flex justify-center flex-wrap gap-3 mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {['All Products', 'Hair Care', 'Skin Care', 'Cleaning Supplies', 'Electrical', 'Plumbing'].map((category, index) => (
+              <motion.button
+                key={category}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                  index === 0 
+                    ? 'bg-accent text-white shadow-lg shadow-accent/20'
+                    : 'bg-card/50 border border-muted/30 hover:border-accent/30 text-foreground hover:text-accent'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                {category}
+              </motion.button>
+            ))}
+          </motion.div>
+          
+          {/* Featured products */}
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {products.slice(0, 8).map((product, index) => (
+              <motion.div
+                key={product.id}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+                }}
+                className={`group relative overflow-hidden rounded-xl ${
+                  isDarkMode 
+                    ? 'bg-card/50 border border-muted/30 hover:border-accent/30' 
+                    : 'bg-white border border-muted/20 hover:border-accent/20 shadow-lg hover:shadow-xl'
+                } transition-all duration-300`}
+                whileHover={{ y: -5 }}
+              >
+                {/* Product image */}
+                <div className="aspect-square overflow-hidden">
+                  <motion.img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  
+                  {/* Quick view overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+                    <button className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium hover:bg-white/30 transition-colors">
+                      Quick View
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Product info */}
+                <div className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-medium text-foreground mb-1">{product.name}</h3>
+                      <p className="text-muted-foreground text-sm">{product.category}</p>
+                    </div>
+                    <div className="text-accent font-bold">₹{product.price}</div>
+                  </div>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center gap-1 mt-3">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={12} 
+                        className={i < Math.floor(product.rating) ? "fill-warning text-warning" : "text-muted-foreground"} 
+                      />
+                    ))}
+                    <span className="text-xs text-muted-foreground ml-1">{product.rating}</span>
+                  </div>
+                  
+                  {/* Add to cart */}
+                  <motion.button 
+                    className="w-full mt-4 py-2 rounded-lg bg-gradient-to-r from-accent to-accent/80 text-white text-sm font-medium flex items-center justify-center gap-2 hover:from-accent/90 hover:to-accent/70"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <ShoppingBag size={14} />
+                    Add to Cart
+                  </motion.button>
+                </div>
+                
+                {/* Badge if available */}
+                {index < 2 && (
+                  <div className="absolute top-3 left-3 px-2 py-1 bg-accent text-white text-xs font-bold rounded-md flex items-center gap-1">
+                    <BadgeCheck size={12} />
+                    Bestseller
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </motion.div>
+          
+          {/* View all products link */}
+          <motion.div 
+            className="mt-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          >
+            <Link to="/shop" className="inline-flex items-center gap-2 text-accent hover:text-accent/80 font-medium">
+              View All Products
               <motion.span
-                className="inline-block ml-2"
                 animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <ArrowRight size={18} />
+                <ChevronRight size={16} />
               </motion.span>
-            </MicroInteractions.Button>
-          </div>
+            </Link>
+          </motion.div>
         </div>
       </section>
-
+      
       {/* Service Process Timeline */}
       <ServiceTimeline />
 
