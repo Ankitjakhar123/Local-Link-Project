@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Offline - LocalLink</title>
+  <style>
+    :root {
+      --background: 220 30% 4%;
+      --foreground: 230 40% 98%;
+      --primary: 260 80% 55%;
+      --primary-foreground: 0 0% 100%;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Space Grotesk', sans-serif;
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, hsl(var(--primary)), #9f7aea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, hsl(var(--primary)), #9f7aea);
+      color: hsl(var(--primary-foreground));
+      padding: 0.8rem 2rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(123, 97, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 1rem;
+    }
+    
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(123, 97, 255, 0.5);
+    }
+    
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(147, 112, 219, 0.2), transparent);
+      animation: pulse 20s infinite alternate;
+      z-index: -1;
+    }
+    
+    .circle-1 {
+      width: 300px;
+      height: 300px;
+      top: -150px;
+      left: -150px;
+    }
+    
+    .circle-2 {
+      width: 400px;
+      height: 400px;
+      bottom: -200px;
+      right: -200px;
+      animation-delay: 2s;
+    }
+    
+    .wifi-icon {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes pulse {
+      0% {
+        opacity: 0.4;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0.7;
+        transform: scale(1.2);
+      }
+    }
+    
+    .tips {
+      text-align: left;
+      margin-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+    
+    .tips h3 {
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+    
+    .tips ul {
+      padding-left: 20px;
+    }
+    
+    .tips li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    
+    <svg class="wifi-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+      <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+      <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+      <line x1="12" y1="20" x2="12" y2="20"></line>
+      <line x1="18" y1="2" x2="6" y2="20" stroke="red" stroke-width="1.5"></line>
+    </svg>
+    
+    <h1>You're Offline</h1>
+    <p>Looks like you've lost your internet connection. Don't worry, some LocalLink features are still available offline.</p>
+    
+    <button class="button" onclick="attemptReconnect()">Try Again</button>
+    
+    <div class="tips">
+      <h3>While you're offline, you can still:</h3>
+      <ul>
+        <li>View previously loaded services</li>
+        <li>Check your saved profile information</li>
+        <li>Browse your booking history</li>
+        <li>Access saved content</li>
+      </ul>
+    </div>
+  </div>
+  
+  <script>
+    function attemptReconnect() {
+      // Check if we're back online
+      if (navigator.onLine) {
+        // Redirect to homepage
+        window.location.href = '/';
+      } else {
+        // Still offline - show message
+        alert('Still offline. Please check your connection and try again.');
+      }
+    }
+    
+    // Listen for online status change
+    window.addEventListener('online', function() {
+      // Redirect to home when back online
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html> 

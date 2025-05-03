@@ -1,93 +1,113 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ArrowRight, Filter, X, Package, Wrench, Star } from 'lucide-react';
+import { Search, ArrowRight, Filter, X, Package, Wrench, Star, Bookmark, ChevronDown, Sparkles } from 'lucide-react';
 import { services } from '../data/services';
 import PageHeader from '../components/PageHeader';
 import SectionContainer from '../components/SectionContainer';
 import AnimatedElement from '../components/AnimatedElement';
 import { motion } from 'framer-motion';
+import ServiceCard from '../components/ServiceCard';
+import { useNotification } from '../components/NotificationSystem';
+import { serviceService } from '../services/service.service';
 
 const ServicesPage = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredServices, setFilteredServices] = useState(services);
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('popular');
+  const [error, setError] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('popular');
+  const [searchQuery, setSearchQuery] = useState('');
+  const { showNotification } = useNotification();
 
-  // All unique categories from services
-  const categories = ['all', ...new Set(services.flatMap(service => 
-    service.categories.map(cat => cat.name)
-  ))];
+  const categories = [
+    { id: 'all', name: 'All Services' },
+    { id: 'salon', name: 'Salon & Spa' },
+    { id: 'appliance', name: 'Appliance Repair' },
+    { id: 'cleaning', name: 'Cleaning' },
+    { id: 'plumbing', name: 'Plumbing' },
+    { id: 'electrical', name: 'Electrical' },
+    { id: 'pest-control', name: 'Pest Control' }
+  ];
 
+  // Fetch services from backend
   useEffect(() => {
-    // Simulate API loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
+    fetchServices();
+  }, [activeCategory, activeFilter]);
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    let results = services;
-    
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      results = results.filter(service => 
-        service.name.toLowerCase().includes(query) || 
-        service.description.toLowerCase().includes(query) ||
-        service.categories.some(cat => 
-          cat.name.toLowerCase().includes(query) ||
-          cat.services.some(s => s.name.toLowerCase().includes(query))
-        )
-      );
-    }
-    
-    // Apply category filter
-    if (selectedCategory !== 'all') {
-      results = results.filter(service => 
-        service.categories.some(cat => cat.name === selectedCategory)
-      );
-    }
-    
-    // Apply sorting
-    if (sortBy === 'price-low') {
-      results = [...results].sort((a, b) => (a.price || 0) - (b.price || 0));
-    } else if (sortBy === 'price-high') {
-      results = [...results].sort((a, b) => (b.price || 0) - (a.price || 0));
-    } else if (sortBy === 'rating') {
-      results = [...results].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    }
-    
-    setFilteredServices(results);
-  }, [searchQuery, selectedCategory, sortBy]);
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    // Search is already applied via the useEffect
-  };
-
-  const clearFilters = () => {
-    setSearchQuery('');
-    setSelectedCategory('all');
-    setSortBy('popular');
-  };
-
-  // Card animation variants
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.5,
-        ease: [0.43, 0.13, 0.23, 0.96]
+  const fetchServices = async () => {
+    try {
+      setLoading(true);
+      
+      // Construct query parameters
+      const query = {};
+      
+      if (activeCategory !== 'all') {
+        query.category = activeCategory;
       }
-    })
+      
+      if (activeFilter === 'popular') {
+        query.sort = 'rating';
+      } else if (activeFilter === 'price-low') {
+        query.sort = 'price';
+      } else if (activeFilter === 'price-high') {
+        query.sort = '-price';
+      } else if (activeFilter === 'newest') {
+        query.sort = '-createdAt';
+      }
+      
+      const response = await serviceService.getServices(query);
+      setServices(response.data);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching services:', err);
+      setError('Failed to load services. Please try again later.');
+      showNotification({
+        title: 'Error',
+        message: 'Failed to load services',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    try {
+      setLoading(true);
+      const response = await serviceService.searchServices(searchQuery);
+      setServices(response.data);
+      
+      if (response.data.length === 0) {
+        showNotification({
+          title: 'No Results',
+          message: `No services found matching "${searchQuery}"`,
+          type: 'info'
+        });
+      }
+    } catch (err) {
+      console.error('Search error:', err);
+      showNotification({
+        title: 'Search Failed',
+        message: 'Failed to search services',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    fetchServices();
+  };
+
+  // Filter and sort displayed services based on user selections
+  const filteredServices = searchQuery.trim() 
+    ? services 
+    : services;
 
   return (
     <div className="bg-background dark">
@@ -108,7 +128,7 @@ const ServicesPage = () => {
         <AnimatedElement animation="fadeInDown" className="mb-8">
           <div className="bg-card/50 backdrop-blur-sm border border-primary/10 rounded-2xl p-6">
             <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <form onSubmit={handleSearchSubmit} className="flex-1">
+              <form onSubmit={handleSearch} className="flex-1">
                 <div className="relative">
                   <input
                     type="text"
@@ -123,27 +143,41 @@ const ServicesPage = () => {
               
               <div className="flex gap-3">
                 <button 
-                  onClick={() => setShowFilters(!showFilters)}
+                  onClick={() => setActiveFilter('popular')}
                   className="btn btn-outline flex items-center gap-2 border-2 border-primary/20 hover:border-primary/70 hover:bg-primary/5"
                 >
                   <Filter size={18} />
-                  Filters
+                  Popular
                 </button>
                 
-                {(searchQuery || selectedCategory !== 'all' || sortBy !== 'popular') && (
-                  <button 
-                    onClick={clearFilters}
-                    className="btn btn-outline flex items-center gap-2 text-muted-foreground border-2 border-muted/30 hover:border-accent/50 hover:text-accent"
-                  >
-                    <X size={18} />
-                    Clear
-                  </button>
-                )}
+                <button 
+                  onClick={() => setActiveFilter('price-low')}
+                  className="btn btn-outline flex items-center gap-2 border-2 border-primary/20 hover:border-primary/70 hover:bg-primary/5"
+                >
+                  <Filter size={18} />
+                  Price: Low to High
+                </button>
+                
+                <button 
+                  onClick={() => setActiveFilter('price-high')}
+                  className="btn btn-outline flex items-center gap-2 border-2 border-primary/20 hover:border-primary/70 hover:bg-primary/5"
+                >
+                  <Filter size={18} />
+                  Price: High to Low
+                </button>
+                
+                <button 
+                  onClick={() => setActiveFilter('newest')}
+                  className="btn btn-outline flex items-center gap-2 border-2 border-primary/20 hover:border-primary/70 hover:bg-primary/5"
+                >
+                  <Filter size={18} />
+                  Newest
+                </button>
               </div>
             </div>
             
             {/* Filter options */}
-            {showFilters && (
+            {activeFilter !== 'popular' && (
               <motion.div 
                 className="bg-card/80 backdrop-blur-md p-6 rounded-xl border border-border mt-4"
                 initial={{ opacity: 0, height: 0 }}
@@ -159,39 +193,14 @@ const ServicesPage = () => {
                       {categories.map((category, index) => (
                         <button
                           key={index}
-                          onClick={() => setSelectedCategory(category)}
+                          onClick={() => setActiveCategory(category.id)}
                           className={`px-4 py-2 rounded-full text-sm transition-all duration-300 ${
-                            selectedCategory === category
+                            activeCategory === category.id
                               ? 'bg-primary text-white shadow-lg shadow-primary/20'
                               : 'bg-card hover:bg-primary/10 border border-border'
                           }`}
                         >
-                          {category === 'all' ? 'All Categories' : category}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Sort options */}
-                  <div>
-                    <h3 className="font-medium mb-3 text-sm uppercase tracking-wider">Sort By</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { id: 'popular', label: 'Most Popular' },
-                        { id: 'rating', label: 'Highest Rating' },
-                        { id: 'price-low', label: 'Price: Low to High' },
-                        { id: 'price-high', label: 'Price: High to Low' }
-                      ].map((option) => (
-                        <button
-                          key={option.id}
-                          onClick={() => setSortBy(option.id)}
-                          className={`px-4 py-2 rounded-full text-sm transition-all duration-300 ${
-                            sortBy === option.id
-                              ? 'bg-secondary text-secondary-foreground shadow-lg shadow-secondary/20'
-                              : 'bg-card hover:bg-secondary/10 border border-border'
-                          }`}
-                        >
-                          {option.label}
+                          {category.name}
                         </button>
                       ))}
                     </div>
@@ -202,93 +211,94 @@ const ServicesPage = () => {
           </div>
         </AnimatedElement>
 
-        {/* Services grid */}
-        {loading ? (
-          <div className="text-center py-32">
-            <div className="inline-block relative w-20 h-20">
-              <div className="absolute top-0 left-0 w-full h-full rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
-              <div className="absolute top-2 left-2 w-16 h-16 rounded-full border-4 border-t-transparent border-r-secondary border-b-transparent border-l-transparent animate-spin animation-delay-200"></div>
-              <div className="absolute top-4 left-4 w-12 h-12 rounded-full border-4 border-t-transparent border-r-transparent border-b-accent border-l-transparent animate-spin animation-delay-500"></div>
+        {/* Featured services */}
+        {!searchQuery && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Featured Services</h2>
+              <div className="flex items-center text-primary">
+                <Sparkles size={16} className="mr-1" />
+                <span className="text-sm font-medium">Premium Quality</span>
+              </div>
             </div>
-            <p className="mt-6 text-muted-foreground">Loading services...</p>
-          </div>
-        ) : filteredServices.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredServices.map((service, index) => (
-              <AnimatedElement
-                key={service.id}
-                className="group h-full"
-                animation="fadeInUp"
-                delay={index * 0.05}
-                custom={index}
-              >
-                <Link 
-                  to={`/services/${service.id}`}
-                  className="block h-full"
-                >
-                  <div className="card-3d h-full bg-card rounded-2xl overflow-hidden border border-primary/10 group-hover:border-primary/30 transition-all duration-500">
-                    <div className="h-48 overflow-hidden relative">
-                      <img 
-                        src={service.image} 
-                        alt={service.name} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      {/* Overlay gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-30"></div>
-                      
-                      {/* Rating badge */}
-                      {service.rating && (
-                        <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm text-primary px-2 py-1 rounded-full text-sm font-medium flex items-center">
-                          <Star size={14} className="fill-primary text-primary mr-1" /> {service.rating}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="p-6 flex flex-col h-[calc(100%-12rem)]">
-                      <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">{service.name}</h3>
-                      <p className="text-muted-foreground mb-4 flex-grow">{service.description}</p>
-                      
-                      {/* Category tags */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {service.categories.slice(0, 3).map((category, index) => (
-                          <span 
-                            key={index}
-                            className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs"
-                          >
-                            {category.name}
-                          </span>
-                        ))}
-                        {service.categories.length > 3 && (
-                          <span className="text-xs text-muted-foreground">+{service.categories.length - 3} more</span>
-                        )}
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-primary font-medium">View Details</span>
-                        <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-all duration-300">
-                          <ArrowRight className="text-primary transition-transform group-hover:translate-x-1" size={18} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </AnimatedElement>
-            ))}
-          </div>
-        ) : (
-          <AnimatedElement animation="fadeIn" className="text-center py-20">
-            <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-10 border border-primary/10 max-w-2xl mx-auto">
-              <Package size={64} className="mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-2xl font-bold mb-3">No services found</h3>
-              <p className="text-muted-foreground mb-6">
-                We couldn't find any services matching your search criteria.
-              </p>
-              <button onClick={clearFilters} className="btn btn-primary px-6">
-                Clear Filters
-              </button>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {loading ? (
+                // Loading skeletons
+                [...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-card animate-pulse rounded-lg h-64"></div>
+                ))
+              ) : error ? (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-error">{error}</p>
+                  <button 
+                    onClick={fetchServices}
+                    className="mt-4 px-4 py-2 bg-primary text-white rounded-lg"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : filteredServices.length > 0 ? (
+                filteredServices.slice(0, 3).map((service, index) => (
+                  <ServiceCard key={service._id} service={service} index={index} premium={true} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p>No featured services found.</p>
+                </div>
+              )}
             </div>
-          </AnimatedElement>
+          </div>
         )}
+        
+        {/* All services */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">
+              {searchQuery ? `Search Results: ${searchQuery}` : 'All Services'}
+            </h2>
+            {!loading && (
+              <span className="text-sm text-muted-foreground">
+                {filteredServices.length} service{filteredServices.length !== 1 ? 's' : ''} found
+              </span>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {loading ? (
+              // Loading skeletons
+              [...Array(8)].map((_, i) => (
+                <div key={i} className="bg-card animate-pulse rounded-lg h-64"></div>
+              ))
+            ) : error ? (
+              <div className="col-span-full text-center py-8">
+                <p className="text-error">{error}</p>
+                <button 
+                  onClick={fetchServices}
+                  className="mt-4 px-4 py-2 bg-primary text-white rounded-lg"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : filteredServices.length > 0 ? (
+              filteredServices.map((service, index) => (
+                <ServiceCard key={service._id} service={service} index={index} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <p>No services found. Try adjusting your filters or search query.</p>
+                {searchQuery && (
+                  <button 
+                    onClick={clearSearch}
+                    className="mt-4 px-4 py-2 bg-primary text-white rounded-lg"
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </SectionContainer>
     </div>
   );

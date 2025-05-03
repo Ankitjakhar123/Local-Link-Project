@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { registerUser } from '../data/users';
+import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight } from 'lucide-react';
+import { useNotification } from '../components/NotificationSystem';
+import { motion } from 'framer-motion';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -12,13 +13,51 @@ const SignupPage = () => {
     password: '',
     confirmPassword: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
   
-  const { signup } = useAuth();
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { signup, loading } = useAuth();
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
+  const containerRef = useRef(null);
+
+  // Remove the 3D tilt effect entirely
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.name) {
+      newErrors.name = 'Name is required';
+    }
+    
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+
+    if (!formData.phone) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^[0-9]{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+      newErrors.phone = 'Phone number must be 10 digits';
+    }
+    
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,256 +70,311 @@ const SignupPage = () => {
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: ''
+        [name]: null
       });
     }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^\+?[0-9]{10,12}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Phone number is invalid';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-    
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Signup form submitted", formData);
     
     if (!validateForm()) {
+      console.log("Form validation failed", errors);
       return;
     }
     
     try {
-      setLoading(true);
-      
-      // Simulate API request delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, this would be an API call
-      const result = registerUser({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
-        address: {}
+      console.log("Attempting signup...");
+      const response = await signup(formData);
+      console.log("Signup successful", response);
+      navigate('/'); // Redirect to home page after successful signup
+    } catch (error) {
+      console.error('Signup error:', error);
+      // Display a user-friendly error in the UI
+      setErrors({
+        ...errors,
+        general: typeof error === 'string' ? error : 'Failed to create account. Please try again.'
       });
-      
-      if (result.success) {
-        setSuccess('Account created successfully! Redirecting to login...');
-        signup(result.user);
-        
-        // Redirect after a delay
-        setTimeout(() => {
-          navigate('/');
-        }, 2000);
-      } else {
-        setErrors({ form: result.message });
-      }
-    } catch (err) {
-      setErrors({ form: 'An error occurred. Please try again.' });
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-16 px-4">
-      <div className="w-full max-w-xl">
-        <div className="bg-card border border-border rounded-lg shadow-sm p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">Create an Account</h1>
-            <p className="text-muted-foreground">
-              Join Local Link and get access to quality services at your doorstep
-            </p>
-          </div>
-          
-          {errors.form && (
-            <div className="bg-error/10 text-error p-4 rounded-md mb-6 flex items-center">
-              <AlertCircle size={18} className="mr-2 flex-shrink-0" />
-              <p>{errors.form}</p>
-            </div>
-          )}
-          
-          {success && (
-            <div className="bg-success/10 text-success p-4 rounded-md mb-6 flex items-center">
-              <CheckCircle size={18} className="mr-2 flex-shrink-0" />
-              <p>{success}</p>
-            </div>
-          )}
-          
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={`input w-full pl-10 ${errors.name ? 'border-error' : ''}`}
-                    placeholder="John Doe"
-                  />
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                </div>
-                {errors.name && <p className="mt-1 text-sm text-error">{errors.name}</p>}
-              </div>
+    <div className="min-h-screen py-20 flex items-center justify-center relative overflow-hidden bg-background">
+      {/* 3D Background Elements */}
+      <div className="absolute inset-0 z-0">
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
+        
+        {/* Animated circles */}
+        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full border border-primary/10 opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-[600px] h-[600px] rounded-full border border-secondary/10 opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+        
+        {/* Geometric patterns */}
+        <div className="absolute inset-0 cyberpunk-grid opacity-5"></div>
+        
+        {/* Animated dots */}
+        {[...Array(12)].map((_, index) => (
+          <motion.div
+            key={`dot-${index}`}
+            className="absolute w-1.5 h-1.5 rounded-full bg-primary/50"
+            style={{
+              top: `${20 + Math.random() * 60}%`,
+              left: `${10 + Math.random() * 80}%`,
+            }}
+            animate={{
+              opacity: [0.4, 0.8, 0.4],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 3,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+        
+        {/* Light beams */}
+        <div className="absolute top-0 left-1/4 w-1 h-full bg-gradient-to-b from-primary/0 via-primary/10 to-primary/0 rotate-[30deg] transform-gpu blur-[5px]"></div>
+        <div className="absolute top-0 right-1/3 w-1 h-full bg-gradient-to-b from-secondary/0 via-secondary/10 to-secondary/0 -rotate-[20deg] transform-gpu blur-[5px]"></div>
+      </div>
+      
+      {/* Glass Card Container - without 3D effect */}
+      <div 
+        ref={containerRef}
+        className="w-full max-w-lg relative z-10"
+      >
+        <div className="p-1 rounded-2xl bg-gradient-to-br from-primary/20 via-background to-secondary/20">
+          <div className="bg-card/80 backdrop-blur-md rounded-xl border border-white/5 shadow-xl p-8 relative overflow-hidden">
+            {/* Card background effects */}
+            <div className="absolute inset-0 bg-card opacity-80"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5"></div>
+            
+            {/* Shimmer effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-primary/10 to-transparent skew-y-12 transform-gpu blur-md opacity-30 animate-[shimmer_5s_infinite]"></div>
+            
+            {/* Content */}
+            <div className="relative z-10">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-center mb-8"
+              >
+                <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Create Account</h1>
+                <p className="text-muted-foreground">
+                  Join LocalLink and access premium services
+                </p>
+              </motion.div>
               
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`input w-full pl-10 ${errors.email ? 'border-error' : ''}`}
-                    placeholder="you@example.com"
-                  />
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                </div>
-                {errors.email && <p className="mt-1 text-sm text-error">{errors.email}</p>}
-              </div>
-              
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium mb-1">
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={`input w-full pl-10 ${errors.phone ? 'border-error' : ''}`}
-                    placeholder="+91 9876543210"
-                  />
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                </div>
-                {errors.phone && <p className="mt-1 text-sm text-error">{errors.phone}</p>}
-              </div>
-              
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={`input w-full pl-10 pr-10 ${errors.password ? 'border-error' : ''}`}
-                    placeholder="••••••••"
-                  />
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                {errors.password && <p className="mt-1 text-sm text-error">{errors.password}</p>}
-              </div>
-              
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className={`input w-full pl-10 ${errors.confirmPassword ? 'border-error' : ''}`}
-                    placeholder="••••••••"
-                  />
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-error">{errors.confirmPassword}</p>
+              <motion.form 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                onSubmit={handleSubmit}
+                className="space-y-5"
+              >
+                {/* General error message */}
+                {errors.general && (
+                  <div className="mb-4 p-3 rounded-lg bg-error/10 border border-error/30 text-error text-sm">
+                    {errors.general}
+                  </div>
                 )}
-              </div>
-              
-              <div className="md:col-span-2">
-                <div className="flex items-center">
-                  <input
-                    id="terms"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                    required
-                  />
-                  <label htmlFor="terms" className="ml-2 block text-sm text-muted-foreground">
-                    I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                
+                {/* Name field */}
+                <div className="relative">
+                  <label htmlFor="name" className="block text-sm font-medium mb-1 text-foreground/80">
+                    Full Name
                   </label>
-                </div>
-              </div>
-              
-              <div className="md:col-span-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary w-full py-3"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"></div>
-                      Creating Account...
-                    </div>
-                  ) : (
-                    'Create Account'
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-4 py-3 rounded-lg bg-background/50 backdrop-blur-sm border-2 ${
+                        errors.name ? 'border-error/50 focus:border-error' : 'border-primary/10 focus:border-primary/30'
+                      } focus:outline-none transition-colors`}
+                      placeholder="Enter your full name"
+                    />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                  </div>
+                  {errors.name && (
+                    <p className="text-error text-sm mt-1 flex items-center">
+                      <span className="ml-1">{errors.name}</span>
+                    </p>
                   )}
-                </button>
-              </div>
+                </div>
+                
+                {/* Email field */}
+                <div className="relative">
+                  <label htmlFor="email" className="block text-sm font-medium mb-1 text-foreground/80">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-4 py-3 rounded-lg bg-background/50 backdrop-blur-sm border-2 ${
+                        errors.email ? 'border-error/50 focus:border-error' : 'border-primary/10 focus:border-primary/30'
+                      } focus:outline-none transition-colors`}
+                      placeholder="Enter your email"
+                    />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                  </div>
+                  {errors.email && (
+                    <p className="text-error text-sm mt-1 flex items-center">
+                      <span className="ml-1">{errors.email}</span>
+                    </p>
+                  )}
+                </div>
+                
+                {/* Phone field */}
+                <div className="relative">
+                  <label htmlFor="phone" className="block text-sm font-medium mb-1 text-foreground/80">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-4 py-3 rounded-lg bg-background/50 backdrop-blur-sm border-2 ${
+                        errors.phone ? 'border-error/50 focus:border-error' : 'border-primary/10 focus:border-primary/30'
+                      } focus:outline-none transition-colors`}
+                      placeholder="Enter your phone number"
+                    />
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                  </div>
+                  {errors.phone && (
+                    <p className="text-error text-sm mt-1 flex items-center">
+                      <span className="ml-1">{errors.phone}</span>
+                    </p>
+                  )}
+                </div>
+                
+                {/* Password field */}
+                <div className="relative">
+                  <label htmlFor="password" className="block text-sm font-medium mb-1 text-foreground/80">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-10 py-3 rounded-lg bg-background/50 backdrop-blur-sm border-2 ${
+                        errors.password ? 'border-error/50 focus:border-error' : 'border-primary/10 focus:border-primary/30'
+                      } focus:outline-none transition-colors`}
+                      placeholder="Create a password"
+                    />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-error text-sm mt-1 flex items-center">
+                      <span className="ml-1">{errors.password}</span>
+                    </p>
+                  )}
+                </div>
+                
+                {/* Confirm Password field */}
+                <div className="relative">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1 text-foreground/80">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-10 py-3 rounded-lg bg-background/50 backdrop-blur-sm border-2 ${
+                        errors.confirmPassword ? 'border-error/50 focus:border-error' : 'border-primary/10 focus:border-primary/30'
+                      } focus:outline-none transition-colors`}
+                      placeholder="Confirm your password"
+                    />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="text-error text-sm mt-1 flex items-center">
+                      <span className="ml-1">{errors.confirmPassword}</span>
+                    </p>
+                  )}
+                </div>
+                
+                {/* Terms and conditions */}
+                <div className="flex items-start my-4">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="terms"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-primary/30 text-primary focus:ring-primary/30"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm text-muted-foreground">
+                    <label htmlFor="terms">
+                      I agree to the <Link to="/terms" className="text-primary hover:text-primary/80">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:text-primary/80">Privacy Policy</Link>
+                    </label>
+                  </div>
+                </div>
+                
+                {/* Submit button */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <button
+                    type="submit"
+                    className="w-full py-3 rounded-lg bg-gradient-to-r from-primary to-secondary text-white font-medium relative overflow-hidden group"
+                    disabled={loading}
+                  >
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className="absolute inset-0 w-0 bg-white mix-blend-overlay rounded-lg group-hover:w-full transition-all duration-300 ease-out"></span>
+                    <span className="relative flex items-center justify-center">
+                      {loading ? 'Creating account...' : 'Sign Up'}
+                      {!loading && <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={16} />}
+                    </span>
+                  </button>
+                </motion.div>
+              </motion.form>
+              
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="mt-6 pt-6 border-t border-white/10 text-center"
+              >
+                <p className="text-muted-foreground">
+                  Already have an account?{' '}
+                  <Link to="/login" className="text-primary hover:text-primary/80 font-medium transition-colors">
+                    Sign in
+                  </Link>
+                </p>
+              </motion.div>
             </div>
-          </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Already have an account?{' '}
-              <Link to="/login" className="text-primary hover:underline font-medium">
-                Sign in
-              </Link>
-            </p>
           </div>
         </div>
       </div>

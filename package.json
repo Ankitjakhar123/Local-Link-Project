@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "chart.js": "^4.4.9",
+    "react-chartjs-2": "^5.3.0"
+  },
+  "devDependencies": {
+    "rollup-plugin-visualizer": "^5.14.0"
+  }
+}

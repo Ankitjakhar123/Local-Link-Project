@@ -1,0 +1,25 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rectangle with gradient -->
+  <rect width="200" height="200" rx="8" fill="url(#gradient)" />
+  
+  <!-- Icon in the center -->
+  <g opacity="0.8">
+    <path d="M80 60H120V90H80V60Z" fill="#F0F0F0" />
+    <path d="M60 100H140V120H60V100Z" fill="#F0F0F0" />
+    <path d="M70 130H130V140H70V130Z" fill="#F0F0F0" />
+  </g>
+  
+  <!-- Image icon -->
+  <path d="M133.333 66.6667H66.6667C63.1667 66.6667 60.3333 69.5 60.3333 73V127C60.3333 130.5 63.1667 133.333 66.6667 133.333H133.333C136.833 133.333 139.667 130.5 139.667 127V73C139.667 69.5 136.833 66.6667 133.333 66.6667ZM81.6667 100.333L91.6667 112.333L105 95.6667L123.333 120H76.6667L81.6667 100.333Z" fill="white" fill-opacity="0.4"/>
+  
+  <!-- Text indicating offline -->
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white">Image Unavailable Offline</text>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#333333" />
+      <stop offset="1" stop-color="#111111" />
+    </linearGradient>
+  </defs>
+</svg> 

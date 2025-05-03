@@ -1,47 +1,54 @@
 {
   "name": "LocalLink - Home Services",
   "short_name": "LocalLink",
-  "description": "Book reliable home services at your doorstep",
+  "description": "Book trusted, professional services for all your home needs",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#18181b",
+  "background_color": "#111827",
   "theme_color": "#845adf",
   "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-96x96.png",
       "sizes": "96x96",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-144x144.png",
       "sizes": "144x144",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-152x152.png",
       "sizes": "152x152",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-384x384.png",
       "sizes": "384x384",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512x512.png",
@@ -50,42 +57,65 @@
       "purpose": "any maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "LocalLink Home Screen"
+    },
+    {
+      "src": "/screenshots/services.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Available Services"
+    },
+    {
+      "src": "/screenshots/booking.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Booking Interface"
+    }
+  ],
   "shortcuts": [
     {
-      "name": "Book a Service",
-      "short_name": "Book Service",
-      "description": "Book a new home service",
+      "name": "View Services",
+      "short_name": "Services",
+      "description": "Browse available services",
       "url": "/services",
       "icons": [
         {
-          "src": "/icons/shortcut-service-192x192.png",
+          "src": "/icons/services-192x192.png",
           "sizes": "192x192"
         }
       ]
     },
     {
-      "name": "View Profile",
-      "short_name": "Profile",
-      "description": "View your profile and bookings",
+      "name": "Book Now",
+      "short_name": "Book",
+      "description": "Book a new service",
+      "url": "/services/book",
+      "icons": [
+        {
+          "src": "/icons/book-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "My Account",
+      "short_name": "Account",
+      "description": "View your account details",
       "url": "/profile",
       "icons": [
         {
-          "src": "/icons/shortcut-profile-192x192.png",
+          "src": "/icons/profile-192x192.png",
           "sizes": "192x192"
         }
       ]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/home-screen.png",
-      "sizes": "1080x1920",
-      "type": "image/png"
-    },
-    {
-      "src": "/screenshots/services-screen.png",
-      "sizes": "1080x1920",
-      "type": "image/png"
     }
   ]
 } 
