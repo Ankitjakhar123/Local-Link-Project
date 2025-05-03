@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, ArrowUpRight, Download, SmartphoneCharging, Sparkles, ShoppingBag, BadgeCheck, ChevronRight, Target } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -37,8 +37,8 @@ const HomePage = () => {
     }
   };
 
-  // Features section data
-  const features = [
+  // Features section data - memoize static data
+  const features = useMemo(() => [
     { 
       icon: "🔍",
       title: "Expert Professionals", 
@@ -59,10 +59,10 @@ const HomePage = () => {
       title: "Satisfaction Guaranteed",
       description: "Quality service or we'll redo it to your satisfaction" 
     }
-  ];
+  ], []);
 
-  // Testimonials data with avatars
-  const testimonials = [
+  // Testimonials data with avatars - memoize static data
+  const testimonials = useMemo(() => [
     {
       id: 1,
       name: "Arundhati Mishra",
@@ -90,10 +90,10 @@ const HomePage = () => {
       service: "Home Cleaning",
       avatar: "https://randomuser.me/api/portraits/women/44.jpg"
     }
-  ];
+  ], []);
 
-  // Transform services data for ProductCard3D
-  const featured3DServices = services.slice(0, 6).map(service => ({
+  // Transform services data for ProductCard3D - memoize data transformation
+  const featured3DServices = useMemo(() => services.slice(0, 6).map(service => ({
     id: service.id,
     name: service.name,
     description: service.description,
@@ -102,7 +102,17 @@ const HomePage = () => {
     reviewCount: 120,
     badge: service.id % 3 === 0 ? 'New' : (service.id % 2 === 0 ? 'Popular' : null),
     type: 'service'
-  }));
+  })), []);
+
+  // Force render on initial load to prevent blank screen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // This will force a re-render
+      setIsDarkMode(prev => prev);
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="bg-background dark">
@@ -230,71 +240,97 @@ const HomePage = () => {
             </div>
           </motion.div>
           
-          {/* Services grid */}
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1
-                }
-              }
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.1 }}
-          >
-            {featured3DServices.map((service, index) => (
-              <motion.div
-                key={service.id}
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-                }}
-              >
-                <ProductCard3D product={service} type="service" />
-              </motion.div>
-            ))}
-          </motion.div>
-          
-          {/* View all button */}
-          <motion.div 
-            className="mt-16 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <MicroInteractions.Button 
-              variant="primary" 
-              size="lg"
-              magneticEffect={true}
-              rippleEffect={true}
-              glowEffect={true}
-              onClick={() => navigate('/services')}
-              className="group relative overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center">
-                View All Services
-                <motion.span
-                  className="ml-2"
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+          {/* Services Display with Box Design */}
+          <div className="relative py-16 my-8 overflow-hidden">
+            {/* Background effect */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[600px] bg-gradient-to-b from-primary/5 to-transparent rounded-[100%] opacity-50"></div>
+            
+            {/* Services display */}
+            <div className="container relative z-10">
+              <div className="flex flex-col justify-center items-center mb-14">
+                {/* First row of services - 3 cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-5xl">
+                  {featured3DServices.slice(0, 3).map((service, index) => (
+                    <motion.div
+                      key={`top-${service.id}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1, duration: 0.5 }}
+                    >
+                      <ProductCard3D product={service} type="service" />
+                    </motion.div>
+                  ))}
+                </div>
+                
+                {/* View All Services button (centered) */}
+                <motion.div
+                  className="relative my-4 z-20"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <ArrowRight size={18} />
-                </motion.span>
-              </span>
+                  <button 
+                    className="btn btn-lg btn-primary rounded-full px-10 py-6 bg-gradient-to-r from-primary to-secondary text-white"
+                    onClick={() => navigate('/services')}
+                  >
+                    <motion.span
+                      className="flex items-center gap-2"
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 400 }}
+                    >
+                      View All Services
+                      <ArrowRight size={18} />
+                    </motion.span>
+                  </button>
+                  
+                  {/* Animated glow effect */}
+                  <motion.div 
+                    className="absolute inset-0 rounded-full -z-10"
+                    animate={{ 
+                      boxShadow: ['0 0 5px rgba(132, 90, 223, 0.3)', '0 0 20px rgba(132, 90, 223, 0.7)', '0 0 5px rgba(132, 90, 223, 0.3)']
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                </motion.div>
+                
+                {/* Second row of services - 3 cards starting from index 2 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 w-full max-w-5xl">
+                  {featured3DServices.slice(2, 5).map((service, index) => (
+                    <motion.div
+                      key={`bottom-${service.id}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3 + (index * 0.1), duration: 0.5 }}
+                    >
+                      <ProductCard3D product={service} type="service" />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
               
-              {/* Button background animation */}
-              <motion.div 
-                className="absolute inset-0 -z-10 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%]"
-                animate={{ backgroundPosition: ['0% center', '100% center', '0% center'] }}
-                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-              />
-            </MicroInteractions.Button>
-          </motion.div>
+              {/* Decorative background elements */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M200,150 Q400,50 600,150" stroke="url(#gradient1)" strokeWidth="1" fill="none" strokeDasharray="5,5" opacity="0.3" />
+                  <path d="M200,250 Q400,350 600,250" stroke="url(#gradient2)" strokeWidth="1" fill="none" strokeDasharray="5,5" opacity="0.3" />
+                  
+                  <defs>
+                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="rgba(132, 90, 223, 0.3)" />
+                      <stop offset="100%" stopColor="rgba(156, 81, 161, 0.3)" />
+                    </linearGradient>
+                    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="rgba(156, 81, 161, 0.3)" />
+                      <stop offset="100%" stopColor="rgba(132, 90, 223, 0.3)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

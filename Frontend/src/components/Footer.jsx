@@ -136,7 +136,7 @@ const Footer = () => {
                 { name: "Services", path: "/services" },
                 { name: "Shop", path: "/shop" },
                 { name: "FAQs", path: "/FAQ" },
-                { name: "Refund", path: "/Refund" },
+                { name: "Refund", path: "/terms#refund-policy" },
                 { name: "Terms & Conditions", path: "/terms" },
                 { name: "Privacy Policy", path: "/privacy" }
               ].map((link, i) => (
